@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<canvas id="bresenham" width="500" height="400" style="border: 1px solid black;">
+</canvas>
+<script>
+
+    function Line(canvasData, x0, y0, x1, y1) {
+        // check the angle
+        var steep = Math.abs(y1 - y0) > Math.abs(x1 - x0)
+        // converting to 1st quarter case
+        // changing axes
+        if (steep) {
+            var tmp = x0
+            x0 = y0
+            y0 = tmp
+
+            tmp = x1
+            x1 = y1
+            y1 = tmp
+        }
+        // line not from left to right
+        // converting to 1st quarter case
+        // changing direction
+        if (x0 > x1) {
+            tmp = x0
+            x0 = x1
+            x1 = tmp
+
+            tmp = y0
+            y0 = y1
+            y1 = tmp
+        }
+        var dx = x1 - x0;
+        var dy = Math.abs(y1 - y0);
+        // optimisation: multiplication by dx helps avoiding floats
+        var error = dx / 2;
+        // direction of y increase
+        var ystep = (y0 < y1) ? 1 : -1;
+        var y = y0;
+
+        for (var x = x0; x <= x1; x++) {
+            // check for swap
+            if (steep) {
+                canvasData.data[(y+x*canvasData.width)*4] = 0
+                canvasData.data[(y+x*canvasData.width)*4 + 1] = 0
+                canvasData.data[(y+x*canvasData.width)*4 + 2] = 0
+                canvasData.data[(y+x*canvasData.width)*4 + 3] = 255
+            } else {
+                canvasData.data[(x+y*canvasData.width)*4] = 0
+                canvasData.data[(x+y*canvasData.width)*4 + 1] = 0
+                canvasData.data[(x+y*canvasData.width)*4 + 2] = 0
+                canvasData.data[(x+y*canvasData.width)*4 + 3] = 255
+            }
+
+            error -= dy;
+            if (error < 0) {
+                y += ystep;
+                error += dx;
+            }
+        }
+    }
+</script>
+<script>
+    var canvas = document.getElementById("bresenham");
+    var ctx = canvas.getContext("2d");
+
+    var flag = 0;
+    x0 = 0;
+    y0 = 0;
+    x1 = 0;
+    y1 = 0;
+
+    // using canvasData for drawing many pixels is more efficient
+    var canvasData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    console.log(canvasData);
+    canvas.addEventListener("click", function(event){
+        if (!flag) {
+            x0 = event.offsetX;
+            y0 = event.offsetY;
+            flag = 1;
+        } else {
+            x1 = event.offsetX;
+            y1 = event.offsetY;
+            Line(canvasData, x0, y0, x1, y1);
+            ctx.putImageData(canvasData, 0, 0);
+            flag = 0;
+        }
+    });
+</script>
+</body>
+</html>
