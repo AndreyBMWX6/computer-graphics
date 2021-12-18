@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<canvas id = 'id'><\canvas>  // canvas - тег, содержащий изображение
+    <script>
+        var canvas = document.getElementById('id');
+        var ctx = canvas.getContext('2d');
+        ctx.fillRect(x, y, width, height); // так как мы работаем с точками, то width и height = 1, 1
+        var ImgData = ctx.get.ImageData(x, y, width, height);
+        /* возвращает массив интенсивностей для точек:
+           1 2 3 4 5
+           6 7 8 9 10
+           11 12 13 14 15
+         */
+        data = ImgData.data; // массив с массивами интненсивности для каждой точки
+        /*
+        [R, G, B, A]
+
+        data[0] - R для (0,0)
+        data[1] - G для (0,0)
+        data[2] - B для (0,0)
+        data[3] - A для (0,0)
+        ...
+        data[54] - B для (3,2)
+        для (i,j)   R->[i*4 + j*width*4] = index
+         */
+        ctx.putImageData(ImgData, x, y); // чтобы записать измененения
+</body>
+</html>
